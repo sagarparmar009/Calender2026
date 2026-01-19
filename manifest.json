@@ -1,0 +1,18 @@
+## ✅ 2️⃣ manifest.json (REQUIRED FOR HOME SCREEN)
+```json
+{
+"name": "Hindu Calendar 2026",
+"short_name": "Calendar",
+"start_url": "index.html",
+"display": "standalone",
+"background_color": "#f4f6f8",
+"theme_color": "#f4a261",
+"icons": [
+{
+"src": "icon.png",
+"sizes": "192x192",
+"type": "image/png"
+}
+]
+}
+```
