@@ -1,0 +1,82 @@
+# 📱 2026 Hindu Festival Calendar – PWA Version.
+
+---
+
+## ✅ 1️⃣ index.html (MAIN APP)
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2026 Hindu Calendar</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f4a261" />
+<style>
+body{font-family:Arial;background:#f4f6f8;margin:0;padding:10px}
+h1{text-align:center}
+button,select,input{padding:8px;margin:5px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{background:#fff;padding:8px;border-radius:6px;text-align:center;cursor:pointer}
+.festival{background:#ffe9c6}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);justify-content:center;align-items:center}
+.modal-content{background:#fff;padding:15px;border-radius:10px;width:90%;max-width:420px}
+</style>
+</head>
+<body>
+<h1>📅 Hindu Calendar 2026</h1>
+<button onclick="Notification.requestPermission()">🔔 Enable Notifications</button>
+<select id="month"></select>
+<div class="calendar" id="cal"></div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 id="dateTitle"></h3>
+    <ul id="list"></ul>
+    <input id="task" placeholder="Task">
+    <input type="time" id="time">
+    <button onclick="addTask()">Add</button>
+    <button onclick="closeM()">Close</button>
+  </div>
+</div>
+
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+
+const fest={"2026-01-14":"Makar Sankranti","2026-02-15":"Maha Shivaratri","2026-03-03":"Holi","2026-10-20":"Dussehra","2026-11-08":"Diwali"};
+const cal=document.getElementById('cal'),monthSel=document.getElementById('month');
+const modal=document.getElementById('modal'),dateTitle=document.getElementById('dateTitle');
+const list=document.getElementById('list'),task=document.getElementById('task'),time=document.getElementById('time');
+let curDate='';
+
+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].forEach((m,i)=>{monthSel.innerHTML+=`<option value="${i}">${m}</option>`});
+monthSel.onchange=()=>draw(monthSel.value);
+
+function draw(m){cal.innerHTML='';const d=new Date(2026,m+1,0).getDate();
+for(let i=1;i<=d;i++){const ds=`2026-${String(+m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+const div=document.createElement('div');div.className='day'+(fest[ds]?' festival':'');
+div.innerHTML=i+(fest[ds]?`<br><small>${fest[ds]}</small>`:'');
+div.onclick=()=>openM(ds);cal.appendChild(div);} }
+
+function openM(d){curDate=d;dateTitle.textContent=d;list.innerHTML='';
+(JSON.parse(localStorage[d]||'[]')).forEach(t=>list.innerHTML+=`<li>${t.text} (${t.time})</li>`);
+modal.style.display='flex';}
+function closeM(){modal.style.display='none';task.value=time.value='';}
+
+function addTask(){if(!task.value||!time.value)return;
+const arr=JSON.parse(localStorage[curDate]||'[]');
+arr.push({text:task.value,time:time.value});localStorage[curDate]=JSON.stringify(arr);
+
+navigator.serviceWorker.ready.then(r=>{
+  r.active.postMessage({title:'Reminder',body:task.value,date:curDate,time:time.value});
+});
+openM(curDate);}
+
+draw(0);
+</script>
+</body>
+</html>
+```
+
+---
+
